@@ -39,7 +39,7 @@
 #include <thread.h>
 #include <current.h>
 #include <synch.h>
-
+#include <spl.h>
 ////////////////////////////////////////////////////////////
 //
 // Semaphore.
@@ -172,7 +172,9 @@ void
 lock_destroy(struct lock *lock)
 {
         KASSERT(lock != NULL);
-
+        if (lock_do_i_hold(lock)) {
+		   
+		  }
         // add stuff here as needed
         
         kfree(lock->lk_name);
@@ -182,27 +184,42 @@ lock_destroy(struct lock *lock)
 void
 lock_acquire(struct lock *lock)
 {
-        // Write this
-
-        (void)lock;  // suppress warning until code gets written
+	     int spl;
+		  spl = splhigh();
+		  if (lock->held) {
+		     // until the lock becomes availble yielf
+			  // to the next runnable thread, but stay
+			  // runnable (ready) 
+		 	  thread_yield();
+		  }
+        splx(spl);
+		  lock->held = 1;
+		  lock->holder = curthread;
 }
 
 void
 lock_release(struct lock *lock)
 {
-        // Write this
-
-        (void)lock;  // suppress warning until code gets written
+        int spl;
+		  spl = splhigh();
+		  if (lock_do_i_hold(lock)){
+		      lock->held = 0;
+				lock->holder = NULL;
+		  }
+		  splx(spl);
 }
 
 bool
 lock_do_i_hold(struct lock *lock)
 {
-        // Write this
-
-        (void)lock;  // suppress warning until code gets written
-
-        return true; // dummy until code gets written
+        int spl;
+		  spl = splhigh();
+		  if (lock->holder == curthread){
+		      splx(spl);
+		      return true;		
+        }
+		  splx(spl);
+		  return false;
 }
 
 ////////////////////////////////////////////////////////////

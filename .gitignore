@@ -1,0 +1,10 @@
+*.[oa]
+common/
+configure
+design/
+man/
+mk/
+root/
+user/
+CHANGES
+kern/compile

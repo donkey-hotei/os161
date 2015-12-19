@@ -192,9 +192,9 @@ lock_acquire(struct lock *lock)
 			  // runnable (ready) 
 		 	  thread_yield();
 		  }
-        splx(spl);
 		  lock->held = 1;
 		  lock->holder = curthread;
+        splx(spl);
 }
 
 void

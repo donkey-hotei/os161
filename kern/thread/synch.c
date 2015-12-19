@@ -205,6 +205,8 @@ lock_release(struct lock *lock)
 		  if (lock_do_i_hold(lock)){
 		      lock->held = 0;
 				lock->holder = NULL;
+		  } else {
+		      kprintf("Thread must acquire a lock before it can release it.");
 		  }
 		  splx(spl);
 }
@@ -262,8 +264,10 @@ cv_destroy(struct cv *cv)
 void
 cv_wait(struct cv *cv, struct lock *lock)
 {
-        // Write this
-        (void)cv;    // suppress warning until code gets written
+
+       	// Write this
+        lock_release(lock); // release the aquired lock
+	     (void)cv;    // suppress warning until code gets written
         (void)lock;  // suppress warning until code gets written
 }
 

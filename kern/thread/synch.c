@@ -164,7 +164,8 @@ lock_create(const char *name)
         }
         
         // add stuff here as needed
-        
+        lock->held = 0;
+        lock->holder = NULL;		  
         return lock;
 }
 
